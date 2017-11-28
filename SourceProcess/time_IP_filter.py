@@ -3,21 +3,21 @@
 import datetime
 import logging
 
-logging.basicCofing(level=logging.DEBUG,format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s: %(message)s')
+#logging.basicCofing(level=logging.DEBUG,format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s: %(message)s')
 
 timelist = ['16:00:00','16:30:00','17:00:00','17:30:00','18:00:00','18:30:00','19:00:00','19:30:00','20:00:00']
 timeoutputlist = []
 datetimelist = []
 
 InnerIP_list = ['166.111','59.66','101.5','101.6','183.172','183.173','118.229']
-fin = open('0517.txt','r')
+fin = open('/lrjapps/netflowdata/datasource/ICMPdata/0517.txt','r')
 
 for time in timelist:
     timestrl = '2017-05-17 '+time
-    timeoutputlist.append('./timefiles/'+ time + '.txt')
+    timeoutputlist.append('/lrjapps/netflowdata/datasource/ICMPdata/times/'+ time + '.txt')
     datetimelist.append(datetime.datetime.strptime(timestrl,'%Y-%m-%d %H:%M:%S'))
 
-print datetimelist[8]
+#print datetimelist[8]
 
 IPlist = [{},{},{},{},{},{},{},{},{}]
 line = fin.readline()
@@ -28,6 +28,8 @@ while line:
         time = items[5]
         dstIP = items[4]
         rttavg = items[6]
+        rttmax = items[8]
+        rttmin = items[7]
         timeTuple = datetime.datetime.strptime(time, '%Y-%m-%d %H:%M:%S')
 
         IPdetails = dstIP.split('.')
@@ -49,14 +51,13 @@ while line:
 
         i = flag
         if dstIP in IPlist[i]:
-            IPlist[i][dstIP].append((time,rttavg))
+            IPlist[i][dstIP].append((time,rttavg,rttmin,rttmax))
         if dstIP not in IPlist[i]:
-            IPlist[i][dstIP] = [(time,rttavg)]
+            IPlist[i][dstIP] = [(time,rttavg,rttmin,rttmax)]
 
     except IndexError:
         fin.close()
         break
-
 
 for i in range(9):
     foutstr = timeoutputlist[i]
@@ -64,8 +65,8 @@ for i in range(9):
     for ip in IPlist[i]:
         prtline = [ip]
         for item in IPlist[i][ip]:
-            prtline.append('('+','.join(item)+')')
-        fout.write(' '.join(prtline)+'\n')
+            prtline.append(','.join(item))
+        fout.write('#'.join(prtline)+'\n')
 
     fout.close()
 
