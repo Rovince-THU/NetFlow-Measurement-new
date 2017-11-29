@@ -14,7 +14,7 @@ def main():
     fin = open('datasource/ICMPdata/times/18:00:00.txt','r')
     line = fin.readline()
     while line:
-        IP = line.split(' ')[0]
+        IP = line.split('#')[0]
         if IP not in ip_list:
             ip_list.append(IP)
         try:
